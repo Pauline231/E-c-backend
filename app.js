@@ -60,7 +60,7 @@ const server = app.listen(PORT,()=>{
 } )
 
 const io = new Server(server, {
-    cors : ['http://localhost:5173','http://localhost:3001']
+    cors : ['https://steakhouse-user.vercel.app/','https://steakhouse-admin.vercel.app/']
 })
 
 let onlineUsers = []
