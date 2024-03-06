@@ -1,3 +1,4 @@
+const Order = require("../../model/orderModel")
 const Product = require("../../model/productModel")
 const Review = require("../../model/reviewModel")
 
@@ -6,12 +7,12 @@ exports.getProducts = async(req, res)=>{
     if(products.length ==0){
         res.status(400).json({
             message: "No products found",
-            products : []
+            data : []
         })
     }else{
         res.status(200).json({
             message : "Products fetched successfully",
-            products
+            data: products
         })
     }
 }
@@ -23,8 +24,9 @@ exports.getProduct = async(req,res)=>{
             message : "Please send id"
         })
     }
-    const product = await Product.find({_id :id})
+    const product = await Product.findById(id)
     const reviews = await Review.find({productID : id}).populate("userID")
+    const orders = await Order.find({'items.product' : id}).populate('user')
     
     if(product.length==0){
         res.status(400).json({
@@ -34,7 +36,8 @@ exports.getProduct = async(req,res)=>{
         res.status(200).json({
             message : "Product found successfully",
             data: product,
-              reviews
+              reviews,
+              orders
         })
     }
 }

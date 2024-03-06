@@ -1,8 +1,8 @@
 const {createProduct, deleteProduct, updateProduct}= require("../../controller/adminuse/product/productcontroller")
 const {authenticate} = require("../../middleware/authenticate")
 const {getProducts, getProduct} = require("../../controller/global/global")
-const roleCheck = require("../../middleware/rolecheck")
-const {multer, storage} = require("../../middleware/multerConfig")
+const roleCheck = require("../../middleware/rolecheck") 
+const {multer, storage} = require ('../../middleware/multerConfig')
 const upload = multer({storage : storage})
 const asyncCatch = require('../../services/asyncCatch')
 

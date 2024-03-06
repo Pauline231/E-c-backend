@@ -20,14 +20,15 @@ exports.registerUser = async(req,res)=>{
     }
 
     //else
-   await User.create({
+   const user = await User.create({
         userName : name,
         userEmail : email,
         userPassword : bcrypt.hashSync(password, 10),
         userPhoneNumber : phoneNumber
     })
     res.status(201).json({
-        message : "User created successfully"
+        message : "User created successfully",
+        data : user
     })
 }
 
@@ -58,7 +59,7 @@ exports.loginUser = async(req,res)=>{
         })
         res.status(200).json({
             message : "User logged in successfully.",
-            token
+            data :token
         })
     }
 }

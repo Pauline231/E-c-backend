@@ -17,7 +17,7 @@ exports.addtoCart = async(req, res)=>{
         }
         const user = await User.findById(userId)
         //checkind if the product is already in cart
-        const productInCart = await user.cart.find((item)=> item.product.equals(productId))
+        const productInCart = user.cart.find((item)=> item.product.equals(productId))
         if(productInCart){
             productInCart.quantity += 1
         }else{
@@ -55,6 +55,7 @@ exports.getMyCartItems = async(req,res)=>{
 exports.deleteItemsFromCart = async(req,res)=>{
     const userID = req.user.id
     const productId = req.params.id
+    console.log(productId)
     const product = await Product.findById(productId)
     if(!product){
         return res.status(404).json({
@@ -63,7 +64,7 @@ exports.deleteItemsFromCart = async(req,res)=>{
     }
     const user = await User.findById(userID)
     //filtering or selecting except the given product id and saving 
-    user.cart = await user.cart.filter((item)=> item.product != productId)
+    user.cart =  user.cart.filter((item)=> item.product != productId)
     await user.save()
     res.status(200).json({
         message: "Item deleted from cart succesfully."
@@ -74,7 +75,6 @@ exports.updateCartItems = async(req,res)=>{
     const userId = req.user.id
     const productId = req.params.id
     const {quantity} = req.body
-
     const user = await User.findById(userId)
     //checking if the product is in cart 
     const itemInCart = user.cart.find((item)=>item.product.equals(productId))
@@ -83,7 +83,7 @@ exports.updateCartItems = async(req,res)=>{
             message : "Item is not present in Cart"
         })  
     }
-    itemInCart.quantity = quantity;
+    itemInCart.quantity = quantity
     await user.save()
     res.status(200).json({
         message : "Item in cart updated succesfully",

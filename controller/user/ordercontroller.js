@@ -54,7 +54,7 @@ exports.deleteMyorder = async(req,res) =>{
             data : []
         })
     }
-    if (userID != Order.user){
+    if (userID != myOrder.user){
         return res.status(404).json({
             message : "You are not allowed."
         })
@@ -103,7 +103,7 @@ exports.updateMyorder = async(req,res)=>{
 
 exports.cancelMyorder = async(req,res)=>{
     const userID = req.user.id
-    const orderID = req.params.id
+    const {orderID} = req.body
     const myOrder = await Order.findById(orderID)
     if(!myOrder){
         return res.status(404).json({

@@ -1,5 +1,6 @@
 const Review = require("../../model/reviewModel")
 const Product = require("../../model/productModel")
+const User = require("../../model/userModel")
 
 exports.createReview = async(req,res)=>{
     const userID = req.user.id
@@ -58,9 +59,10 @@ exports.deleteReview = async(req, res)=>{
             message : "Review is not found"
         })
     }
-    //to check if the deleter is the reviewowner
-    const reviewOwner = review.userID   
-    if(reviewOwner != userID){
+    const user = await User.findById(userID)
+    console.log(user)
+    //to check if the deleter is the admin
+    if(user.role != 'admin'){
         return res.status(403).json({
             message : "You are not authorized to delete this review."
         })

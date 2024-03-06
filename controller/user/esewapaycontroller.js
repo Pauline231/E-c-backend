@@ -34,11 +34,12 @@ exports.initiateEsewa = async(req,res)=>{
         "product_code": "EPAYTEST",
         "signature": hash,
         "signed_field_names": "total_amount,transaction_uuid,product_code",
-        "success_url": "http://localhost:3000/success",
+        "success_url": "http://localhost:5173/",
         "tax_amount": "0",
         "total_amount": amount,
         "transaction_uuid": orderId
         }
     const response = await axios.post("https://epay.esewa.com.np/api/epay/main/v2/form",data)
     const bufResponse = Buffer.from(response,"base64")
+    console.log(bufResponse)
 }

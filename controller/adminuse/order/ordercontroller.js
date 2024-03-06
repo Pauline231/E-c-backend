@@ -21,7 +21,10 @@ exports.getAllorders = async(req,res)=>{
 
 exports.getSingleOrder = async(req,res)=>{
     const orderID = req.params.id
-    const order = await Order.findById(orderID)
+    const order = await Order.findById(orderID).populate({
+        path : "items.product",
+        model : 'Product'
+    }).populate('user')
     if(!order){
         return res.status(404).json({
             message : "No order found with that id."
@@ -36,8 +39,9 @@ exports.getSingleOrder = async(req,res)=>{
 exports.updateOrderstatus = async(req, res)=>{
     const orderId = req.params.id
     const {orderStatus} = req.body
+    console.log(orderStatus)
     const order = await Order.findById(orderId)
-    if(!orderStatus || !["pending","delivered","cancelled","ontheway","processing"].includes(orderStatus.tolowerCase())){
+    if(!orderStatus || !["pending","delivered","cancelled","ontheway","processing"].includes(orderStatus)){
         return res.status(400).json({
             message : "Please provide a valid orderStatus."
         })
@@ -53,23 +57,27 @@ exports.updateOrderstatus = async(req, res)=>{
         path : "items.product",
         ref : "Product"
     }).populate('user')
+
     let productData
     if(orderStatus === 'delivered'){
         productData = updatedOrder.items.map((item)=>{
             return {
                 quantity: item.quantity,
-                productId : item.product._id,
+                productId : item.product._id, 
                 productStockQty : item.product.productQty
             }
         })
-    }
+    
     for(var i=0;i<productData.length;i++){
         await Product.findByIdAndUpdate(productData.productId,{
             productQty : productData[i].productStockQty - productData[i].quantity
         })
     }
+}
+
     res.status(200).json({
-        message : "Orderstatus updated successfully."
+        message : "Orderstatus updated successfully.",
+        data : updatedOrder
     })
 }
 
@@ -81,7 +89,7 @@ exports.deleteOrder = async(req,res)=>{
             message : "No order found with that id."
         })
     }
-    await Order.findByIdAndUpdate(orderId)
+    await Order.findByIdAndDelete(orderId)
     res.status(200).json({
         message : "Order deleted succesfully."
     })
@@ -90,8 +98,9 @@ exports.deleteOrder = async(req,res)=>{
 exports.updatePaymentStatus = async(req,res)=>{
     const orderId = req.params.id
     const {paymentStatus} = req.body
+    console.log(paymentStatus)
     const order = await Order.findById(orderId)
-    if(!paymentStatus|| ["paid", "unpaid","pending"].includes(paymentStatus.tolowerCase())){
+    if(!paymentStatus|| !["paid", "unpaid","pending"].includes(paymentStatus)){
         return res.status(400).json({
             message : "Please provide a valid payment status."
         })
@@ -104,10 +113,11 @@ exports.updatePaymentStatus = async(req,res)=>{
     const updatedOrder = await Order.findByIdAndUpdate(orderId,{
         'paymentDetails.status' : paymentStatus
     },{new: true}).populate({
-        path : "items.product",
+        path : "items.product", 
         ref : "Product"
     }).populate("user")
     res.status(200).json({
-        message : "Payment Status has been updated successfully."
+        message : "Payment Status has been updated successfully.",
+        data : updatedOrder
     })    
 }

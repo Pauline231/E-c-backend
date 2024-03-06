@@ -1,8 +1,14 @@
 const fs = require("fs")
 const Product= require("../../../model/productModel")
+const Order = require("../../../model/orderModel")
+const { dataUri } = require("../../../middleware/multerConfig")
+const cloudinary = require('../../../config/cloudinaryconfig')
 
 exports.createProduct =async(req, res)=>{
+    const result = await cloudinary.uploader.upload(req.file.path);
+    
     const file = req.file
+    console.log(file)
     let filePath
     if(!file){
         filePath = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2hvZXN8ZW58MHx8MHx8fDA%3D"
@@ -23,7 +29,7 @@ exports.createProduct =async(req, res)=>{
         productPrice,
         productQty,
         productStatus,
-        productImage : process.env.BACKEND_URL + filePath
+        productImage : result.secure_url
     })
     res.status(200).json({
         message : "Product created succesfully."
@@ -60,9 +66,10 @@ exports.updateProduct = async(req, res)=>{
     }
     oldImage = oldData.productImage
     const sliceLength = process.env.BACKEND_URL.length
-    const afterSlice = oldImage.slice(sliceLength)
+    const afterSlice = oldImage?.slice(sliceLength)
     if(req.file && req.file.filename){
-        await fs.unlink("./uploads/" +afterSlice, (err)=>{
+         result = await cloudinary.uploader.upload(req.file.path)
+         fs.unlink("./uploads/" +afterSlice, (err)=>{
             if(err){
                 console.log('error deleting file',err)
             }else{
@@ -70,9 +77,10 @@ exports.updateProduct = async(req, res)=>{
             }
         })
     }
+   
     const data = await Product.findByIdAndUpdate(id,{
         productDescription,
-        productImage: req.file && req.file.filename ? process.env.BACKEND_URL + req.file.filename : oldImage,
+        productImage: req.file && req.file.filename ? result.secure_url : oldImage,
         productName,
         productPrice,
         productQty,
@@ -80,5 +88,20 @@ exports.updateProduct = async(req, res)=>{
     })
     res.status(200).json({
         message : "Product updated succesfully"
+    })
+}
+
+exports.getProductOrder = async(req,res)=>{
+    const productId = req.params.id
+    const productExist = await Product.findById(productId)
+    if(!productExist){
+     return   res.status(400).json({
+            message : "No product found with that id."
+        })
+    }
+    const order = await Order.find({'items.product' : productId})
+    res.status(200).json({
+        message : "Orders with that product fetched successfully.",
+        data : order
     })
 }
