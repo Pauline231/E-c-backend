@@ -8,7 +8,6 @@ exports.createProduct =async(req, res)=>{
     const result = await cloudinary.uploader.upload(req.file.path);
     
     const file = req.file
-    console.log(file)
     let filePath
     if(!file){
         filePath = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8c2hvZXN8ZW58MHx8MHx8fDA%3D"
