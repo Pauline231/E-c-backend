@@ -8,7 +8,7 @@ const reviewModel = new Schema({
     },
     productID :{
         type : Schema.Types.ObjectId,
-        ref : "Project"
+        ref : "Product"
     },
     rating : {
         type : Number,
