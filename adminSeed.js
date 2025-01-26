@@ -2,7 +2,7 @@ const User = require("./model/userModel")
 const bcrypt = require("bcrypt")
 
 const adminSeed = async() =>{
-    const adminExist = await User.findOne({userEmail : "admin002@gmail.com"})
+    const adminExist = await User.findOne({userEmail : "admin001@gmail.com"})
     if(!adminExist){
       await User.create({
             userName : "admin",
